@@ -1,10 +1,7 @@
 package com.flightapi.flightbooking.controller;
 
-import com.flightapi.flightbooking.model.Airport;
-import com.flightapi.flightbooking.service.AirportService;
 import com.flightapi.flightbooking.model.Flight;
 import com.flightapi.flightbooking.service.FlightService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +12,11 @@ import java.util.List;
 @RequestMapping("/api/flights")
 public class FlightController {
 
-    @Autowired
-    private FlightService flightService;
+    private final FlightService flightService;
 
-    @Autowired
-    private AirportService airportService;
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
+    }
 
     @GetMapping
     public List<Flight> getAllFlights() {
@@ -40,7 +37,7 @@ public class FlightController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Flight> updateFlight(@PathVariable Long id, @RequestBody Flight flight) {
-        if (!flightService.getFlightById(id).isPresent()) {
+        if (flightService.getFlightById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         flight.setId(id);
@@ -49,7 +46,7 @@ public class FlightController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFlight(@PathVariable Long id) {
-        if (!flightService.getFlightById(id).isPresent()) {
+        if (flightService.getFlightById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         flightService.deleteFlight(id);
@@ -57,20 +54,14 @@ public class FlightController {
     }
 
     @GetMapping("/search")
-    public List<Flight> searchFlights(@RequestParam Long departureAirportId,
-                                      @RequestParam Long arrivalAirportId,
-                                      @RequestParam LocalDateTime departureDate,
-                                      @RequestParam(required = false) LocalDateTime returnDate) {
+    public ResponseEntity<List<Flight>> searchFlights(
+            @RequestParam Long departureAirportId,
+            @RequestParam Long arrivalAirportId,
+            @RequestParam LocalDateTime departureDate,
+            @RequestParam(required = false) LocalDateTime returnDate) {
 
-        Airport departureAirport = airportService.getAirportById(departureAirportId).orElse(null);
-        Airport arrivalAirport = airportService.getAirportById(arrivalAirportId).orElse(null);
-
-        if (departureAirport == null || arrivalAirport == null) {
-            // In a real application, we should return a more meaningful error response here.
-            throw new IllegalArgumentException("Invalid airport IDs");
-        }
-
-        return flightService.searchFlights(departureAirport, arrivalAirport, departureDate, returnDate);
+        List<Flight> flights = flightService.searchFlights(departureAirportId, arrivalAirportId, departureDate, returnDate);
+        return ResponseEntity.ok(flights);
     }
 
 }

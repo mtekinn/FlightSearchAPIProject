@@ -2,6 +2,7 @@ package com.flightapi.flightbooking.service;
 
 import com.flightapi.flightbooking.model.Airport;
 import com.flightapi.flightbooking.model.Flight;
+import com.flightapi.flightbooking.repository.AirportRepository;
 import com.flightapi.flightbooking.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ public class FlightService {
 
     @Autowired
     private FlightRepository flightRepository;
+
+    @Autowired
+    private AirportRepository airportRepository;
 
     public List<Flight> getAllFlights() {
         return flightRepository.findAll();
@@ -32,14 +36,17 @@ public class FlightService {
         flightRepository.deleteById(id);
     }
 
-    public List<Flight> searchFlights(Airport departureAirport, Airport arrivalAirport,
-                                      LocalDateTime departureDate, LocalDateTime returnDate) {
+    public List<Flight> searchFlights(Long departureAirportId, Long arrivalAirportId, LocalDateTime departureDate, LocalDateTime returnDate) {
+        Airport departureAirport = airportRepository.findById(departureAirportId).orElseThrow(() -> new RuntimeException("Departure Airport not found"));
+        Airport arrivalAirport = airportRepository.findById(arrivalAirportId).orElseThrow(() -> new RuntimeException("Arrival Airport not found"));
+
         if (returnDate == null) {
-            return flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateAndReturnDateIsNull(
-                    departureAirport, arrivalAirport, departureDate);
+            return flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateAndReturnDateIsNull(departureAirport, arrivalAirport, departureDate);
         } else {
-            return flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(
-                    departureAirport, arrivalAirport, departureDate, returnDate);
+            List<Flight> departFlights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(departureAirport, arrivalAirport, departureDate, departureDate);
+            List<Flight> returnFlights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(arrivalAirport, departureAirport, returnDate, returnDate);
+            departFlights.addAll(returnFlights);
+            return departFlights;
         }
     }
 }
