@@ -1,4 +1,6 @@
+/*
 package com.flightapi.flightbooking.service;
+
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +15,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return User.builder()
                 .username("admin")
-                .password(new BCryptPasswordEncoder().encode("password"))
+                .password(new BCryptPasswordEncoder().encode("{noop}password"))
                 .roles("USER")
                 .build();
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.flightapi.flightbooking.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -17,3 +18,4 @@ public class SecurityConfig {
                 .httpBasic();
     }
 }
+*/
