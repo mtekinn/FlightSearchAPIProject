@@ -63,5 +63,4 @@ public class FlightController {
         List<Flight> flights = flightService.searchFlights(departureAirportId, arrivalAirportId, departureDate, returnDate);
         return ResponseEntity.ok(flights);
     }
-
 }

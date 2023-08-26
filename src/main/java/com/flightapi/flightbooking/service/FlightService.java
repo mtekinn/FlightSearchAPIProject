@@ -40,13 +40,13 @@ public class FlightService {
         Airport departureAirport = airportRepository.findById(departureAirportId).orElseThrow(() -> new RuntimeException("Departure Airport not found"));
         Airport arrivalAirport = airportRepository.findById(arrivalAirportId).orElseThrow(() -> new RuntimeException("Arrival Airport not found"));
 
-        if (returnDate == null) {
-            return flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateAndReturnDateIsNull(departureAirport, arrivalAirport, departureDate);
-        } else {
-            List<Flight> departFlights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(departureAirport, arrivalAirport, departureDate, departureDate);
+        List<Flight> departFlights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(departureAirport, arrivalAirport, departureDate, departureDate);
+
+        if (returnDate != null) {
             List<Flight> returnFlights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(arrivalAirport, departureAirport, returnDate, returnDate);
             departFlights.addAll(returnFlights);
-            return departFlights;
         }
+
+        return departFlights;
     }
 }

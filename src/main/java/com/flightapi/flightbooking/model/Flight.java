@@ -3,6 +3,7 @@ package com.flightapi.flightbooking.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Flight {
@@ -23,7 +24,7 @@ public class Flight {
     public Flight() {
     }
 
-    public Flight(Airport departureAirport, Airport arrivalAirport, LocalDateTime departureDate, LocalDateTime returnDate, Double price) {
+    public Flight(Airport departureAirport,  Airport arrivalAirport, LocalDateTime departureDate, LocalDateTime returnDate, Double price) {
         this.departureAirport = departureAirport;
         this.arrivalAirport = arrivalAirport;
         this.departureDate = departureDate;
