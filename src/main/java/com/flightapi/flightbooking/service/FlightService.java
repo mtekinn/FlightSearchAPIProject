@@ -4,7 +4,6 @@ import com.flightapi.flightbooking.model.Airport;
 import com.flightapi.flightbooking.model.Flight;
 import com.flightapi.flightbooking.repository.AirportRepository;
 import com.flightapi.flightbooking.repository.FlightRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,11 +13,14 @@ import java.util.Optional;
 @Service
 public class FlightService {
 
-    @Autowired
-    private FlightRepository flightRepository;
+    private final FlightRepository flightRepository;
 
-    @Autowired
-    private AirportRepository airportRepository;
+    private final AirportRepository airportRepository;
+
+    public FlightService(AirportRepository airportRepository, FlightRepository flightRepository) {
+        this.airportRepository = airportRepository;
+        this.flightRepository = flightRepository;
+    }
 
     public List<Flight> getAllFlights() {
         return flightRepository.findAll();

@@ -4,28 +4,29 @@ import com.flightapi.flightbooking.model.Airport;
 import com.flightapi.flightbooking.model.Flight;
 import com.flightapi.flightbooking.repository.AirportRepository;
 import com.flightapi.flightbooking.repository.FlightRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
+
 import java.util.Optional;
+
 
 @Service
 public class FlightSchedulerService {
 
-    @Autowired
-    private FlightRepository flightRepository;
+    private final FlightRepository flightRepository;
 
-    @Autowired
-    private AirportRepository airportRepository;
+    private final AirportRepository airportRepository;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public FlightSchedulerService(FlightRepository flightRepository, AirportRepository airportRepository, RestTemplate restTemplate) {
+        this.flightRepository = flightRepository;
+        this.airportRepository = airportRepository;
+        this.restTemplate = restTemplate;
+    }
 
     @Scheduled(cron = "0 0 0 * * ?") // It will run at 00:00:00 every day
     public void updateFlightsFromApi() {
@@ -34,13 +35,10 @@ public class FlightSchedulerService {
                 Flight[].class);
 
         Flight[] flightsFromApi = response.getBody();
-
         if (flightsFromApi != null) {
-            List<Flight> existingFlights = flightRepository.findAll();
-
             for (Flight flightFromApi : flightsFromApi) {
                 // If the flight is already in the database, update it
-                Optional<Flight> matchingFlight = existingFlights.stream().filter(f -> f.getId().equals(flightFromApi.getId())).findFirst();
+                Optional<Flight> matchingFlight = flightRepository.findById(flightFromApi.getId());
                 if (matchingFlight.isPresent()) {
                     Flight flightToUpdate = matchingFlight.get();
                     // Flight's fields can be updated like this
@@ -55,6 +53,7 @@ public class FlightSchedulerService {
         }
     }
 
+
     @Scheduled(cron = "0 0 1 * * ?") // It will run at 01:00:00 every day
     public void updateAirportsFromApi() {
         ResponseEntity<Airport[]> response = restTemplate.getForEntity(
@@ -62,13 +61,10 @@ public class FlightSchedulerService {
                 Airport[].class);
 
         Airport[] airportsFromApi = response.getBody();
-
         if (airportsFromApi != null) {
-            List<Airport> existingAirports = airportRepository.findAll();
-
             for (Airport airportFromApi : airportsFromApi) {
                 // If the airport is already in the database, update it
-                Optional<Airport> matchingAirport = existingAirports.stream().filter(a -> a.getId().equals(airportFromApi.getId())).findFirst();
+                Optional<Airport> matchingAirport = airportRepository.findById(airportFromApi.getId());
                 if (matchingAirport.isPresent()) {
                     Airport airportToUpdate = matchingAirport.get();
                     // Update the fields like this

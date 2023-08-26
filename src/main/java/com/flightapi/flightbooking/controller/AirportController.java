@@ -2,7 +2,6 @@ package com.flightapi.flightbooking.controller;
 
 import com.flightapi.flightbooking.model.Airport;
 import com.flightapi.flightbooking.service.AirportService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/api/airports")
 public class AirportController {
 
-    @Autowired
-    private AirportService airportService;
+    private final AirportService airportService;
+
+    public AirportController(AirportService airportService) {
+        this.airportService = airportService;
+    }
 
     @GetMapping
     public List<Airport> getAllAirports() {
@@ -34,7 +36,7 @@ public class AirportController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Airport> updateAirport(@PathVariable Long id, @RequestBody Airport airport) {
-        if (!airportService.getAirportById(id).isPresent()) {
+        if (airportService.getAirportById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         airport.setId(id);
@@ -43,7 +45,7 @@ public class AirportController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirport(@PathVariable Long id) {
-        if (!airportService.getAirportById(id).isPresent()) {
+        if (airportService.getAirportById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         airportService.deleteAirport(id);
