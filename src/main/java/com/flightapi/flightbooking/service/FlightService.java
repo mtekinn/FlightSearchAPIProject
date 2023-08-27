@@ -14,12 +14,11 @@ import java.util.Optional;
 public class FlightService {
 
     private final FlightRepository flightRepository;
-
     private final AirportRepository airportRepository;
 
-    public FlightService(AirportRepository airportRepository, FlightRepository flightRepository) {
-        this.airportRepository = airportRepository;
+    public FlightService(FlightRepository flightRepository, AirportRepository airportRepository) {
         this.flightRepository = flightRepository;
+        this.airportRepository = airportRepository;
     }
 
     public List<Flight> getAllFlights() {
@@ -39,8 +38,12 @@ public class FlightService {
     }
 
     public List<Flight> searchFlights(Long departureAirportId, Long arrivalAirportId, LocalDateTime departureDate, LocalDateTime returnDate) {
-        Airport departureAirport = airportRepository.findById(departureAirportId).orElseThrow(() -> new RuntimeException("Departure Airport not found"));
-        Airport arrivalAirport = airportRepository.findById(arrivalAirportId).orElseThrow(() -> new RuntimeException("Arrival Airport not found"));
+        Airport departureAirport = airportRepository.findById(departureAirportId).orElse(null);
+        Airport arrivalAirport = airportRepository.findById(arrivalAirportId).orElse(null);
+
+        if (departureAirport == null || arrivalAirport == null) {
+            throw new RuntimeException("Could not find one or both airports.");
+        }
 
         List<Flight> departFlights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureDateBetween(departureAirport, arrivalAirport, departureDate, departureDate);
 

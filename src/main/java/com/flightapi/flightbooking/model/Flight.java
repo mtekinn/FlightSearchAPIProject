@@ -11,9 +11,11 @@ public class Flight {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "departure_airport_id")
     private Airport departureAirport;
 
     @ManyToOne
+    @JoinColumn(name = "arrival_airport_id")
     private Airport arrivalAirport;
 
     private LocalDateTime departureDate;
@@ -23,7 +25,7 @@ public class Flight {
     public Flight() {
     }
 
-    public Flight(Airport departureAirport,  Airport arrivalAirport, LocalDateTime departureDate, LocalDateTime returnDate, Double price) {
+    public Flight(Airport departureAirport, Airport arrivalAirport, LocalDateTime departureDate, LocalDateTime returnDate, Double price) {
         this.departureAirport = departureAirport;
         this.arrivalAirport = arrivalAirport;
         this.departureDate = departureDate;
